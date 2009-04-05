@@ -27,7 +27,7 @@ Options:
 
 Commands:
   -f, --flush					flush all failure counts from the CIB
-  -l, --list          list all failure counts in the CIB.
+  -l, --list          list all failure counts in the CIB
 EOF
 }
 
@@ -40,8 +40,8 @@ Written by Joe Khoobyar <joe@ankhcraft.com>
 EOF
 }
 
-SHORTOPTS="hVvH:ibzudlfFsS"
-LONGOPTS="help,version,verbose,delete,list"
+SHORTOPTS="hVvfl"
+LONGOPTS="help,version,verbose,flush,list"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
@@ -50,12 +50,9 @@ else
     OPTS=$(getopt $SHORTOPTS "$@")
 fi 
 
-if [ $? -ne 0 ]; then
-    echo "'$progname --help' for more information" 1>&2
-    exit 1
-fi
+[ "$OPTS" = " --" ] && OPTS=" -l --"
 
-eval set -- "$OPTS"
+eval set -- "${OPTS}"
 
 while [ $# -gt 0 ]; do
 case $1 in
@@ -68,10 +65,10 @@ case $1 in
   -v|--verbose)
     export VERBOSE=1; shift
     ;;
-  -d|--delete)
+  -f|--flush)
 		cibadmin -Q -o status | grep 'name="fail-count-' | while read; do cibadmin -D -X "$REPLY"; done; break
   	;;
-  -l|--list)
+  -l|--list|'')
   	cibadmin -Q -o status | grep 'name="fail-count-'; break
   	;;
   --)
