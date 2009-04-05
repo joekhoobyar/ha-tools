@@ -7,7 +7,7 @@
 #
 PREFIX = /usr/local
 GROUP = root
-TOOLS = cib_failcounts
+TOOLS = cib_failcounts cib_errors
 
 all: check
 
