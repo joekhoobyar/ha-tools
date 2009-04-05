@@ -81,7 +81,7 @@ case $1 in
 		if [ -z "$NODES" ]; then print_usage; exit 1; fi
 		shift
 		for i in $NODES; do
-			crm_resource $FORCE -C -H $i -r $1
+			crm_resource $FORCE -C -H $i -r $3
 		done
 		exit 0
   	;;
