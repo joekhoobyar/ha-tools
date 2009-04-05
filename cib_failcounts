@@ -72,7 +72,6 @@ case $1 in
   	cibadmin -Q -o status | grep 'name="fail-count-'; break
   	;;
   --)
-    shift
     break
     ;;
   *)
