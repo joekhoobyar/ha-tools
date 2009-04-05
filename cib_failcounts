@@ -23,7 +23,7 @@ EOF
 print_version()
 {
     cat <<EOF
-$progname (ha-tools) $version  [$revision]
+$progname (ha-tools) $version
 Copyright (C) 2009 All Rights Reserved
 Written by Joe Khoobyar <joe@ankhcraft.com>
 EOF
