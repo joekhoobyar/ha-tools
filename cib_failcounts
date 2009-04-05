@@ -1,4 +1,15 @@
 #!/bin/sh
+#
+# Directly administer failure counts in the CIB.
+#
+# This is useful, since crm_failcount doesn't catch everything.
+#
+# http://github.com/joekhoobyar/ha-tools
+#
+# Author:		Joe Khoobyar <joe@ankhcraft.com>
+# License:	GNU General Public License (GPL) version 2
+# Copyright (c) 2009 All Rights Reserved
+#
 
 version=0.1
 progname=$(basename $0)
