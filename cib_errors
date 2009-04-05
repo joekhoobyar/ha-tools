@@ -79,7 +79,6 @@ case $1 in
   	;;
   -C|--clear)
 		if [ -z "$NODES" ]; then print_usage; exit 1; fi
-		shift
 		for i in $NODES; do
 			crm_resource $FORCE -C -H $i -r $3
 		done
