@@ -16,7 +16,7 @@ progname=$(basename $0)
 
 print_usage() {
     cat <<EOF
-Usage: $progname {command}
+Usage: $progname command
 
 Directly administer failure counts in the CIB.
 

@@ -14,7 +14,7 @@ progname=$(basename $0)
 
 print_usage() {
     cat <<EOF
-Usage: $progname {command}
+Usage: $progname [options] command resource-id
 
 A tool to deal with errors in the CIB.
 
@@ -23,9 +23,13 @@ Options:
   -V, --version       print program version
   -v, --verbose       verbose output
 
+  -f, --force         force the operation
+  -a, --all           apply to all nodes
+  -H, --host NODE     apply to only this node
+
 Commands:
-  -f, --flush         flush all failure counts from the CIB
-  -l, --list          list all failure counts in the CIB
+
+  -C, --clear         clear resource errors
 EOF
 }
 
@@ -38,8 +42,8 @@ Written by Joe Khoobyar <joe@ankhcraft.com>
 EOF
 }
 
-SHORTOPTS="hVvfl"
-LONGOPTS="help,version,verbose,flush,list"
+SHORTOPTS="hVvfaH:C"
+LONGOPTS="help,version,verbose,force,all,host,clear"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
@@ -63,9 +67,23 @@ case $1 in
   -v|--verbose)
     export VERBOSE=1; shift
     ;;
-  -f|--flush)
-		echo "Not implemented."
-		exit 1
+  -a|--all)
+		NODES=$(ccm_tool -p)
+  	;;
+  -H|--host)
+		NODES=$2
+		shift 2
+  	;;
+  -f|--force)
+		FORCE="-f"
+  	;;
+  -C|--clear)
+		if [ -z "$NODES" ]; then print_usage; exit 1; fi
+		shift
+		for i in $NODES; do
+			crm_resource $FORCE -C -H $i -r $1
+		done
+		exit 0
   	;;
   --)
     shift
@@ -76,5 +94,6 @@ case $1 in
     exit 1
     ;;
 esac
+shift
 done
 
