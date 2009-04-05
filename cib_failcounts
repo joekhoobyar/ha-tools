@@ -1,0 +1,76 @@
+#!/bin/sh
+
+version=0.1
+progname=$(basename $0)
+
+print_usage() {
+    cat <<EOF
+Usage: $progname {command}
+
+Directly administer failure counts in the CIB.
+
+Options:
+  -h, --help          print this usage message
+  -V, --version       print program version
+  -v, --verbose       verbose output
+
+Commands:
+  -f, --flush					flush all failure counts from the CIB
+  -l, --list          list all failure counts in the CIB.
+EOF
+}
+
+print_version()
+{
+    cat <<EOF
+$progname (cx-setup) $version  [$revision]
+Copyright (C) 2009 All Rights Reserved
+Written by Joe Khoobyar <joe@ankhcraft.com>
+EOF
+}
+
+SHORTOPTS="hVvH:ibzudlfFsS"
+LONGOPTS="help,version,verbose,delete,list"
+if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
+    OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
+else
+    case $1 in --help) print_usage; exit 0 ;; esac
+    case $1 in --version) print_version ; exit 0 ;; esac
+    OPTS=$(getopt $SHORTOPTS "$@")
+fi 
+
+if [ $? -ne 0 ]; then
+    echo "'$progname --help' for more information" 1>&2
+    exit 1
+fi
+
+eval set -- "$OPTS"
+
+while [ $# -gt 0 ]; do
+case $1 in
+  -h|--help)
+    print_usage; exit 0
+    ;;
+  -V|--version)
+    print_version; exit 0
+    ;;
+  -v|--verbose)
+    export VERBOSE=1; shift
+    ;;
+  -d|--delete)
+		cibadmin -Q -o status | grep 'name="fail-count-' | while read; do cibadmin -D -X "$REPLY"; done; break
+  	;;
+  -l|--list)
+  	cibadmin -Q -o status | grep 'name="fail-count-'; break
+  	;;
+  --)
+    shift
+    break
+    ;;
+  *)
+    echo "Internal Error: option processing error: $1" 1>&2
+    exit 1
+    ;;
+esac
+done
+
