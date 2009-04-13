@@ -67,7 +67,7 @@ die() {
 }
 
 run_agent() {
-	if [ -z "$2" ] || [ -n "${2##-}" ]; then
+	if [ -z "$2" ] || [ "${2##-*}" != "$2" ]; then
 		[ -n "$CRM_CHECK" ] && die "option -c requires a resource instance name"
 		env $agent_args $agent_bin $1
 	elif [ "$1" != "status" ] && [ -n "$CRM_CHECK" ] && crm_resource -r "$2" -W -Q | grep -v $(crm_hostname); then
