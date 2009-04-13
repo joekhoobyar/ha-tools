@@ -31,8 +31,12 @@ Options:
 Commands:
 
   -M, --metadata      display the resource agent's metadata
+  -C, --validate-all  validate the resource and it's configuration
   -m, --monitor       monitor the resource
   -s, --status        check the resource's status, a la an LSB initscript
+  -A, --start         stop the resource
+  -Z, --stop          start the resource
+  -R, --reload        gracefully reload the resource
 EOF
 }
 
@@ -49,8 +53,8 @@ agent="${1//:://}"
 shift
 if [ -z "$agent" ]; then print_usage; exit 1; fi
 
-SHORTOPTS="hVvp:Mms"
-LONGOPTS="help,version,verbose,param,metadata,monitor,status"
+SHORTOPTS="hVvp:MCmsAZR"
+LONGOPTS="help,version,verbose,param,metadata,validate-all,monitor,status,start,stop,reload"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
