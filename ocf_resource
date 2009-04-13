@@ -53,6 +53,30 @@ Written by Joe Khoobyar <joe@ankhcraft.com>
 EOF
 }
 
+print_error() {
+	echo "$progname: error -" "$@" 1>&2
+}
+
+print_warning() {
+	echo "$progname: warning -" "$@" 1>&2
+}
+
+die() {
+	print_error "$@"
+	exit 1
+}
+
+run_agent() {
+	if [ -z "$2" ]; then
+		[ -n "$CRM_CHECK" ] && die "missing resource agent name (try --help)"
+		env $agent_args $agent_bin $1
+	elif [ -n "$CRM_CHECK" ] && crm_resource -r "$2" -W -Q | grep -v $(crm_hostname); then
+		print_warning "skipping $1: resource $2 is not running via the CRM"
+	else
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin $1
+	fi
+}
+
 : ${OCF_ROOT:=/usr/lib/ocf}
 OCF_BIN=$OCF_ROOT/resource.d
 export OCF_ROOT
@@ -64,26 +88,20 @@ if [ -z "$agent" ]; then
 	print_usage; exit 1
 elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
-	if ! [ -x "$agent_bin" ]; then
-		echo "$progname: error - no such resource agent: $agent" 1>&2
-		exit 1;
-	fi
+	[ -x "$agent_bin" ] || die "no such resource agent \`$agent'"
 elif [ -x "$OCF_BIN/heartbeat/$agent" ]; then
 	agent="heartbeat::$agent"
-	echo "$progname: warning - guessing fully-qualified resource agent name: $agent" 1>&2
+	print_warning "guessing fully-qualified resource agent name: $agent"
 	agent_bin="$OCF_BIN/${agent//:://}"
 else
 	agent=$(find $OCF_BIN -maxdepth 2 -mindepth 2 -name IPaddr2 -not -type d | sed -ne 's@^/usr/lib/ocf/resource.d/\([^/]\+\)/@\1::@p' | head -1)
-	if [ -z "$agent" ]; then
-		echo "$progname: error - no such resource agent: $agent" 1>&2
-		exit 1
-	fi
-	echo "$progname: warning - guessing fully-qualified resource agent name: $agent" 1>&2
+	[ -z "$agent" ] && die "no such resource agent: $agent"
+	print_warning "guessing fully-qualified resource agent name: $agent"
 	agent_bin="$OCF_BIN/${agent//:://}"
 fi
 
-SHORTOPTS="hVvp:MCmsAZR"
-LONGOPTS="help,version,verbose,param,metadata,validate-all,monitor,status,start,stop,reload"
+SHORTOPTS="hVvcp:MC:m:s:A:Z:r:R::"
+LONGOPTS="help,version,verbose,check,param,metadata,validate-all,monitor,status,start,stop,reload,run"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
@@ -107,26 +125,32 @@ case $1 in
   -v|--verbose)
     export VERBOSE=1
     ;;
+  -c|--check-crm)
+    export CRM_CHECK=1
+    ;;
   -M|--metadata)
-		env $agent_args $agent_bin meta-data
+		run_agent meta-data
   	;;
   -C|--validate-all)
-		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin validate-all; shift
+		run_agent validate-all "$2"; shift
   	;;
   -m|--monitor)
-		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin monitor; shift
+		run_agent monitor "$2"; shift
   	;;
   -s|--status)
-		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin status; shift
+		run_agent status "$2"; shift
   	;;
   -A|--start)
-		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin start; shift
+		run_agent start "$2"; shift
   	;;
   -Z|--stop)
-		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin stop; shift
+		run_agent stop "$2"; shift
   	;;
   -R|--reload)
-		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin reload; shift
+		run_agent reload "$2"; shift
+  	;;
+  -r|--run)
+		run_agent "$3" "$2"; shift 2
   	;;
   -p|--param)
 		agent_args="$agent_args OCF_RESKEY_${2%%=*}=${2#*=} "; shift
