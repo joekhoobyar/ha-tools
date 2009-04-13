@@ -100,7 +100,7 @@ else
 	agent_bin="$OCF_BIN/${agent//:://}"
 fi
 
-SHORTOPTS="hVvcp:MC:m:s:A:Z:r:R::"
+SHORTOPTS="hVvcp:MC:msAZrR:"
 LONGOPTS="help,version,verbose,check,param,metadata,validate-all,monitor,status,start,stop,reload,run"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
@@ -150,7 +150,7 @@ case $1 in
 		run_agent reload "$2"; shift
   	;;
   -r|--run)
-		run_agent "$3" "$2"; shift 2
+		run_agent "$2" "$3"; shift 2
   	;;
   -p|--param)
 		agent_args="$agent_args OCF_RESKEY_${2%%=*}=${2#*=} "; shift
