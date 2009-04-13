@@ -84,11 +84,23 @@ case $1 in
   -M|--metadata)
 		env $agent_args $agent_bin meta-data
   	;;
+  -C|--validate-all)
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin validate-all; shift
+  	;;
   -m|--monitor)
 		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin monitor; shift
   	;;
   -s|--status)
 		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin status; shift
+  	;;
+  -A|--start)
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin start; shift
+  	;;
+  -Z|--stop)
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin stop; shift
+  	;;
+  -R|--reload)
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin reload; shift
   	;;
   -p|--param)
 		agent_args="$agent_args OCF_RESKEY_${2%%=*}=${2#*=} "; shift
