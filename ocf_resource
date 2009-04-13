@@ -26,7 +26,7 @@ Options:
   -h, --help          print this usage message
   -V, --version       print program version
   -v, --verbose       verbose output
-  -p, --param         OCF parameters, in the form:  "name=value"
+  -p, --param         OCF parameters, in the form:  "name value"
 
 Commands:
 
@@ -91,7 +91,7 @@ case $1 in
 		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin status; shift 2
   	;;
   -p|--param)
-		agent_args="OCF_RESKEY_${2%%=*}=${2#*=} "; shift 2
+		agent_args="OCF_RESKEY_${2%% *}=${2#* } "; shift 2
   	;;
   --)
     shift
