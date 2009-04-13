@@ -13,6 +13,9 @@ version=0.1
 progname=$(basename $0)
 
 print_usage() {
+	if [ -x "$agent_bin" ]; then
+		$agent_bin help
+	else
     cat <<EOF
 Usage: $progname resource-agent [options] command [resource-id]
 
@@ -38,6 +41,7 @@ Commands:
   -Z, --stop          start the resource
   -R, --reload        gracefully reload the resource
 EOF
+	fi
 }
 
 print_version()
