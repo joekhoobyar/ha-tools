@@ -44,8 +44,6 @@ else
     OPTS=$(getopt $SHORTOPTS "$@")
 fi 
 
-[ "$OPTS" = " --" ] && OPTS=" -h --"
-
 eval set -- "${OPTS}"
 
 while [ $# -gt 0 ]; do
@@ -71,7 +69,7 @@ esac
 shift
 done
 
-CRM_UUID=$(crm_uuid -r)
+CRM_UUID=$(if [ $VERBOSE = "1" ]; then crm_uuid -r; else crm_uuid; fi)
 CRM_HOSTNAME=$(cibadmin -Q -o nodes | tr '\n' ' ' | tr -s ' ' | tr '>' '\n' | grep -- "$CRM_UUID" | sed -e 's@^.*uname="\([^"]*\)".*$@\1@g')
 if [ -z "$CRM_HOSTNAME" ]; then
 	echo "$progname: failed to retrieve hostname from the CRM" 1>&2
