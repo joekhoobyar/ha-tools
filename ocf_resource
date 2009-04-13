@@ -79,7 +79,7 @@ case $1 in
     export VERBOSE=1; shift
     ;;
   -M|--metadata)
-		$agent_bin metadata
+		$agent_bin meta-data
   	;;
   --)
     shift
