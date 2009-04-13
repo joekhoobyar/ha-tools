@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# A tool to display the current hostname as known by the CRM.
+#
+# http://github.com/joekhoobyar/ha-tools
+#
+# Author:		Joe Khoobyar <joe@ankhcraft.com>
+# License:	GNU General Public License (GPL) version 2
+# Copyright (c) 2009 All Rights Reserved
+#
+
+version=0.1
+progname=$(basename $0)
+
+print_usage() {
+    cat <<EOF
+Usage: $progname [options]
+
+A tool to deal with errors in the CIB.
+
+Options:
+  -h, --help          print this usage message
+  -V, --version       print program version
+  -v, --verbose       verbose output
+EOF
+}
+
+print_version()
+{
+    cat <<EOF
+$progname (ha-tools) $version
+Copyright (C) 2009 All Rights Reserved
+Written by Joe Khoobyar <joe@ankhcraft.com>
+EOF
+}
+
+SHORTOPTS="hVv"
+LONGOPTS="help,version,verbose"
+if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
+    OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
+else
+    case $1 in --help) print_usage; exit 0 ;; esac
+    case $1 in --version) print_version ; exit 0 ;; esac
+    OPTS=$(getopt $SHORTOPTS "$@")
+fi 
+
+[ "$OPTS" = " --" ] && OPTS=" -h --"
+
+eval set -- "${OPTS}"
+
+while [ $# -gt 0 ]; do
+case $1 in
+  -h|--help)
+    print_usage; exit 0
+    ;;
+  -V|--version)
+    print_version; exit 0
+    ;;
+  -v|--verbose)
+    export VERBOSE=1
+    ;;
+  --)
+		shift
+    break
+    ;;
+  *)
+    echo "Internal Error: option processing error: $1" 1>&2
+    exit 1
+    ;;
+esac
+shift
+done
+
+CRM_UUID=$(crm_uuid -r)
+CRM_HOSTNAME=$(cibadmin -Q -o nodes | tr '\n' ' ' | tr -s ' ' | tr '>' '\n' | grep -- "$CRM_UUID" | sed -e 's@^.*uname="\([^"]*\)".*$@\1@g')
+if [ -z "$CRM_HOSTNAME" ]; then
+	echo "$progname: failed to retrieve hostname from the CRM" 1>&2
+	exit 1
+elif [ "$VERBOSE" = "1" ]; then
+	echo "$progname: $CRM_HOSTNAME (crm_uuid: $CRM_UUID)"
+else
+	echo $CRM_HOSTNAME
+fi
+
