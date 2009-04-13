@@ -62,6 +62,7 @@ eval set -- "${OPTS}"
 
 : ${OCF_ROOT:=/usr/lib/ocf}
 OCF_BIN=$OCF_ROOT/resource.d
+export OCF_ROOT
 
 agent_bin="$OCF_BIN/$agent"
 if ! [ -x "$agent_bin" ]; then print_usage; exit 1; fi
