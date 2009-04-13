@@ -100,8 +100,8 @@ else
 	agent_bin="$OCF_BIN/${agent//:://}"
 fi
 
-SHORTOPTS="hVvcp:MC:msAZrR:"
-LONGOPTS="help,version,verbose,check,param,metadata,validate-all,monitor,status,start,stop,reload,run"
+SHORTOPTS="hVvcp:M::C:m::s::A::Z::r::R:"
+LONGOPTS="help,version,verbose,check,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
