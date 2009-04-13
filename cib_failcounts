@@ -63,13 +63,13 @@ case $1 in
     print_version; exit 0
     ;;
   -v|--verbose)
-    export VERBOSE=1; shift
+    export VERBOSE=1
     ;;
   -f|--flush)
-		cibadmin -Q -o status | grep 'name="fail-count-' | while read; do cibadmin -D -X "$REPLY"; done; break
+		cibadmin -Q -o status | grep 'name="fail-count-' | while read; do cibadmin -D -X "$REPLY"; done
   	;;
   -l|--list|'')
-  	cibadmin -Q -o status | grep 'name="fail-count-'; break
+  	cibadmin -Q -o status | grep 'name="fail-count-'
   	;;
   --)
     break

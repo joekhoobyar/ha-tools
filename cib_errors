@@ -65,14 +65,14 @@ case $1 in
     print_version; exit 0
     ;;
   -v|--verbose)
-    export VERBOSE=1; shift
+    export VERBOSE=1
     ;;
   -a|--all)
 		NODES=$(ccm_tool -p)
   	;;
   -H|--host)
 		NODES=$2
-		shift 2
+		shift
   	;;
   -f|--force)
 		FORCE="-f"
