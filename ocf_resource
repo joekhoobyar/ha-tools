@@ -26,7 +26,7 @@ Options:
   -h, --help          print this usage message
   -V, --version       print program version
   -v, --verbose       verbose output
-  -p, --param         OCF parameters, in the form:  "name value"
+  -p, --param         OCF parameters, in the form:  name="value"
 
 Commands:
 
@@ -79,19 +79,19 @@ case $1 in
     print_version; exit 0
     ;;
   -v|--verbose)
-    export VERBOSE=1; shift
+    export VERBOSE=1
     ;;
   -M|--metadata)
-		env $agent_args $agent_bin meta-data; shift
+		env $agent_args $agent_bin meta-data
   	;;
   -m|--monitor)
-		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin monitor; shift 2
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin monitor; shift
   	;;
   -s|--status)
-		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin status; shift 2
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin status; shift
   	;;
   -p|--param)
-		agent_args="OCF_RESKEY_${2%% *}=${2#* } "; shift 2
+		agent_args="$agent_args OCF_RESKEY_${2%%=*}=${2#=*} "; shift
   	;;
   --)
     shift
