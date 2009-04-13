@@ -62,7 +62,7 @@ elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
 	if ! [ -x "$agent_bin" ]; then
 		echo "$progname: error - no such resource agent: $agent" 1>&2
-		print_usage; exit 1;
+		exit 1;
 	fi
 elif [ -x "$OCF_BIN/heartbeat/$agent" ]; then
 	agent="heartbeat::$agent"
@@ -72,7 +72,7 @@ else
 	agent=$(find $OCF_BIN -maxdepth 2 -mindepth 2 -name IPaddr2 -not -type d | sed -ne 's@^/usr/lib/ocf/resource.d/\([^/]\+\)/@\1::@p' | head -1)
 	if [ -z "$agent" ]; then
 		echo "$progname: error - no such resource agent: $agent" 1>&2
-		print_usage; exit 1
+		exit 1
 	fi
 	echo "$progname: warning - guessing fully-qualified resource agent name: $agent" 1>&2
 	agent_bin="$OCF_BIN/${agent//:://}"
