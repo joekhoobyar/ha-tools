@@ -26,10 +26,13 @@ Options:
   -h, --help          print this usage message
   -V, --version       print program version
   -v, --verbose       verbose output
+  -p, --param         OCF parameters, in the form:  "name=value"
 
 Commands:
 
   -M, --metadata      display the resource agent's metadata
+  -m, --monitor       monitor the resource
+  -s, --status        check the resource's status, a la an LSB initscript
 EOF
 }
 
@@ -46,8 +49,8 @@ agent="$1"
 shift
 if [ -z "$agent" ]; then print_usage; exit 1; fi
 
-SHORTOPTS="hVvM"
-LONGOPTS="help,version,verbose,metadata"
+SHORTOPTS="hVvp:Mms"
+LONGOPTS="help,version,verbose,param,metadata,monitor,status"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
@@ -79,7 +82,16 @@ case $1 in
     export VERBOSE=1; shift
     ;;
   -M|--metadata)
-		$agent_bin meta-data
+		env $agent_args $agent_bin meta-data; shift
+  	;;
+  -m|--monitor)
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin monitor; shift 2
+  	;;
+  -s|--status)
+		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin status; shift 2
+  	;;
+  -p|--param)
+		agent_args="OCF_RESKEY_${2%%=*}=${2#*=} "; shift 2
   	;;
   --)
     shift
