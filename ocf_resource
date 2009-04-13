@@ -68,9 +68,9 @@ die() {
 
 run_agent() {
 	if [ -z "$2" ]; then
-		[ -n "$CRM_CHECK" ] && die "missing resource agent name (try --help)"
+		[ -n "$CRM_CHECK" ] && die "option -c requires a resource instance name"
 		env $agent_args $agent_bin $1
-	elif [ -n "$CRM_CHECK" ] && crm_resource -r "$2" -W -Q | grep -v $(crm_hostname); then
+	elif [ "$1" != "status" ] && [ -n "$CRM_CHECK" ] && crm_resource -r "$2" -W -Q | grep -v $(crm_hostname); then
 		print_warning "skipping $1: resource $2 is not running via the CRM"
 	else
 		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin $1
