@@ -45,7 +45,7 @@ Written by Joe Khoobyar <joe@ankhcraft.com>
 EOF
 }
 
-agent="$1"
+agent="${1//:://}"
 shift
 if [ -z "$agent" ]; then print_usage; exit 1; fi
 
