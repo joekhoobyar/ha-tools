@@ -1,0 +1,94 @@
+#!/bin/sh
+#
+# A tool to administer OCF resources directly.
+#
+# http://github.com/joekhoobyar/ha-tools
+#
+# Author:		Joe Khoobyar <joe@ankhcraft.com>
+# License:	GNU General Public License (GPL) version 2
+# Copyright (c) 2009 All Rights Reserved
+#
+
+version=0.1
+progname=$(basename $0)
+
+print_usage() {
+    cat <<EOF
+Usage: $progname resource-agent [options] command [resource-id]
+
+A tool to deal with errors in the CIB.
+
+Resource Agent:
+
+  A fully-qualified resource agent name, such as: heartbeat/IPaddr2
+
+Options:
+  -h, --help          print this usage message
+  -V, --version       print program version
+  -v, --verbose       verbose output
+
+Commands:
+
+  -M, --metadata      display the resource agent's metadata
+EOF
+}
+
+print_version()
+{
+    cat <<EOF
+$progname (ha-tools) $version
+Copyright (C) 2009 All Rights Reserved
+Written by Joe Khoobyar <joe@ankhcraft.com>
+EOF
+}
+
+agent="$1"
+shift
+if [ -z "$agent" ]; then print_usage; exit 1; fi
+
+SHORTOPTS="hVvM"
+LONGOPTS="help,version,verbose,metadata"
+if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
+    OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
+else
+    case $1 in --help) print_usage; exit 0 ;; esac
+    case $1 in --version) print_version ; exit 0 ;; esac
+    OPTS=$(getopt $SHORTOPTS "$@")
+fi 
+
+[ "$OPTS" = " --" ] && OPTS=" -h --"
+
+eval set -- "${OPTS}"
+
+: ${OCF_ROOT:=/usr/lib/ocf}
+OCF_BIN=$OCF_ROOT/resource.d
+
+agent_bin="$OCF_BIN/$agent"
+if ! [ -x "$agent_bin" ]; then print_usage; exit 1; fi
+
+while [ $# -gt 0 ]; do
+case $1 in
+  -h|--help)
+    print_usage; exit 0
+    ;;
+  -V|--version)
+    print_version; exit 0
+    ;;
+  -v|--verbose)
+    export VERBOSE=1; shift
+    ;;
+  -M|--metadata)
+		$agent_bin metadata
+  	;;
+  --)
+    shift
+    break
+    ;;
+  *)
+    echo "Internal Error: option processing error: $1" 1>&2
+    exit 1
+    ;;
+esac
+shift
+done
+

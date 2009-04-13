@@ -7,7 +7,7 @@
 #
 PREFIX = /usr/local
 GROUP = root
-TOOLS = cib_failcounts cib_errors
+TOOLS = cib_failcounts cib_errors ocf_resource
 
 all: check
 
