@@ -153,7 +153,11 @@ case $1 in
 		run_agent "$2" "$3"; shift 2
   	;;
   -p|--param)
-		agent_args="$agent_args OCF_RESKEY_${2%%=*}=${2#*=} "; shift
+		if [ "${2:0:16}" = "OCF_CHECK_LEVEL=" ]; then
+			agent_args="$agent_args OCF_CHECK_LEVEL=${2#*=} "; shift
+		else
+			agent_args="$agent_args OCF_RESKEY_${2%%=*}=${2#*=} "; shift
+		fi
   	;;
   --)
     break
