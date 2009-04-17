@@ -113,6 +113,7 @@ fi
 [ "$OPTS" = " --" ] && OPTS=" -h --"
 
 eval set -- "${OPTS}"
+retval=0
 
 while [ $# -gt 0 ]; do
 case $1 in
@@ -129,28 +130,28 @@ case $1 in
     export CRM_CHECK=1
     ;;
   -M|--metadata)
-		run_agent meta-data
+		run_agent meta-data; retval=$?
   	;;
   -C|--validate-all)
-		run_agent validate-all "$2"; shift
+		run_agent validate-all "$2"; retval=$?; shift
   	;;
   -m|--monitor)
-		run_agent monitor "$2"; shift
+		run_agent monitor "$2"; retval=$?; shift
   	;;
   -s|--status)
-		run_agent status "$2"; shift
+		run_agent status "$2"; retval=$?; shift
   	;;
   -A|--start)
-		run_agent start "$2"; shift
+		run_agent start "$2"; retval=$?; shift
   	;;
   -Z|--stop)
-		run_agent stop "$2"; shift
+		run_agent stop "$2"; retval=$?; shift
   	;;
   -R|--reload)
-		run_agent reload "$2"; shift
+		run_agent reload "$2"; retval=$?; shift
   	;;
   -r|--run)
-		run_agent "$2" "$3"; shift 2
+		run_agent "$2" "$3"; retval=$?; shift 2
   	;;
   -p|--param)
 		if [ "${2:0:16}" = "OCF_CHECK_LEVEL=" ]; then
@@ -168,5 +169,7 @@ case $1 in
     ;;
 esac
 shift
+[ $retval -ne 0 ] && break
 done
 
+exit $retval
