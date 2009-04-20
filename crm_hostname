@@ -70,7 +70,7 @@ shift
 done
 
 CRM_UUID=$(if [ "$VERBOSE" = "1" ]; then crm_uuid -r; else crm_uuid; fi)
-CRM_HOSTNAME=$(cibadmin -Q -o nodes | tr '\n' ' ' | tr -s ' ' | tr '>' '\n' | grep -- "$CRM_UUID" | sed -e 's@^.*uname="\([^"]*\)".*$@\1@g')
+CRM_HOSTNAME=$(cibadmin -Q -o nodes | tr '\n' ' ' | sed -e 's@> *@>\n@g;' | grep -- "$CRM_UUID" | sed -e 's@^.*uname="\([^"]*\)".*$@\1@g')
 if [ -z "$CRM_HOSTNAME" ]; then
 	echo "$progname: failed to retrieve hostname from the CRM" 1>&2
 	exit 1

@@ -54,6 +54,10 @@ fi
 
 eval set -- "${OPTS}"
 
+get_failcounts() {
+	cibadmin -Q -o status | tr '\n' ' ' | sed -e 's@> *@>\n@g;' | grep 'name="fail-count-'
+}
+
 while [ $# -gt 0 ]; do
 case $1 in
   -h|--help)
@@ -66,10 +70,10 @@ case $1 in
     export VERBOSE=1
     ;;
   -f|--flush)
-		cibadmin -Q -o status | grep 'name="fail-count-' | while read; do cibadmin -D -X "$REPLY"; done
+		get_failcounts | while read; do cibadmin -D -X "$REPLY"; done
   	;;
   -l|--list|'')
-  	cibadmin -Q -o status | grep 'name="fail-count-'
+  	get_failcounts
   	;;
   --)
     break
