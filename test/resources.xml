@@ -1,0 +1,10 @@
+<resources>
+	<primitive id="test-IP-Addr" class="ocf" type="IPaddr2" provider="heartbeat">
+		<instance_attributes id="test-IP-Addr_instance_attrs">
+			<attributes>
+				<nvpair id="test-IP-Addr_ip" name="ip" value="192.168.2.5"/>
+				<nvpair id="test-IP-Addr_iflabel" name="iflabel" value="tst"/>
+			</attributes>
+		</instance_attributes>
+	</primitive>
+</resources>
