@@ -84,7 +84,7 @@ export OCF_ROOT
 # Check the resource agent for validity.  Try to auto-detect when not fully-qualified.
 agent="$1"
 shift
-if [ -z "$agent" ]; then
+if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
 elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
