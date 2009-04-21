@@ -24,7 +24,7 @@ install-shares: $(SHARES)
 
 gen-tools: $(TOOLS)
 	mkdir -p gen
-	sed -e 's@\$$(dirname \$$0)/@$${HA_TOOLS_SHARE:-$(PREFIX)/share/ha-tools}@g;' <$$i >>gen/$$i
+	sed -e 's@\$$(dirname \$$0)/@$${HA_TOOLS_SHARE="$(PREFIX)/share/ha-tools"}@g;' <$$i >>gen/$$i
 
 clean:
 	rm -rf gen

@@ -11,7 +11,7 @@
 
 version=0.1
 progname=$(basename $0)
-HA_TOOLS_SHARE=$(dirname $0)
+: ${HA_TOOLS_SHARE=$(dirname $0)}
 
 print_usage() {
 	if [ -x "$agent_bin" ]; then
