@@ -1,4 +1,16 @@
-<?xml version='1.0' encoding='iso-8859-1'?>
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+
+An XSLT script to convert a primitive resource from HA-Linux CIB xml
+into environment variables that can be used with OCF resource agents.
+
+http://github.com/joekhoobyar/ha-tools
+
+Author:		Joe Khoobyar <joe@ankhcraft.com>
+License:	GNU General Public License (GPL) version 2
+Copyright (c) 2009 All Rights Reserved
+
+-->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
 	<xsl:output method="text" version="1.0" encoding="utf-8" media-type="text/plain"/>
