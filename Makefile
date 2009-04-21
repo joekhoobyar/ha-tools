@@ -20,6 +20,7 @@ install-tools: $(addprefix gen/, $(TOOLS))
 	install -m 755 -o root -g $(GROUP) $^ $(PREFIX)/sbin
 
 install-shares: $(SHARES)
+	mkdir -p $(PREFIX)/share/ha-tools
 	install -m 644 -o root -g $(GROUP) $^ $(PREFIX)/share/ha-tools
 
 gen-tools: $(TOOLS)
