@@ -18,25 +18,21 @@ Copyright (c) 2009 All Rights Reserved
 	<xsl:param name="resource-id"/>
 
 	<xsl:template match="//resources">
-		<xsl:value-of select="concat('OCF_RESOURCE_INSTANCE=&quot;',$resource-id,'&quot;')"/><xsl:text>
-</xsl:text>
+		<xsl:value-of select="concat('OCF_RESOURCE_INSTANCE=&quot;',$resource-id,'&quot; ')"/>
 		<xsl:apply-templates select=".//primitive[@id = $resource-id]"/>
 	</xsl:template>
 
 	<xsl:template match="primitive[@class = 'ocf']">
-		<xsl:value-of select="concat('OCF_RESOURCE_AGENT=&quot;',@provider,'::',@type,'&quot;')"/><xsl:text>
-</xsl:text>
 		<xsl:apply-templates select="./instance_attributes/attributes/nvpair"/>
+		<xsl:value-of select="concat('&quot;$OCF_ROOT/resource.d/',@provider,'/',@type,'&quot;')"/>
 	</xsl:template>
 
 	<xsl:template match="nvpair[@name = 'OCF_CHECK_LEVEL']">
-		<xsl:value-of select="concat('OCF_CHECK_LEVEL=&quot;',@value,'&quot;')"/><xsl:text>
-</xsl:text>
+		<xsl:value-of select="concat('OCF_CHECK_LEVEL=&quot;',@value,'&quot; ')"/>
 	</xsl:template>
 
 	<xsl:template match="nvpair">
-		<xsl:value-of select="concat('OCF_RESKEY_',@name,'=&quot;',@value,'&quot;')"/><xsl:text>
-</xsl:text>
+		<xsl:value-of select="concat('OCF_RESKEY_',@name,'=&quot;',@value,'&quot; ')"/>
 	</xsl:template>
 
 </xsl:stylesheet>
