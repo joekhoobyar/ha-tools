@@ -8,7 +8,7 @@
 PREFIX = /usr/local
 GROUP = root
 TOOLS = crm_hostname cib_failcounts cib_errors ocf_resource
-SHARES = resource2variables.xslt
+SHARES = resource2shell.xslt
 
 all: check
 
