@@ -90,7 +90,7 @@ if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 elif [ "$agent" = "--cib-resource" ] || [ "$agent" = "-i" ]; then
 	resource="$1"
 	shift
-	agent_args=$(cibadmin -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2variables.xslt -)
+	agent_args=$(cibadmin -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2shell.xslt -)
 	agent_bin=
 elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
