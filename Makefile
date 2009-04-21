@@ -8,17 +8,26 @@
 PREFIX = /usr/local
 GROUP = root
 TOOLS = crm_hostname cib_failcounts cib_errors ocf_resource
+SHARES = resource2variables.xslt
 
 all: check
 
 install: install-all
 
-install-all: install-tools
+install-all: gen-tools install-tools install-shares
 
-install-tools: $(TOOLS)
+install-tools: $(addprefix gen/, $(TOOLS))
 	install -m 755 -o root -g $(GROUP) $^ $(PREFIX)/sbin
 
+install-shares: $(SHARES)
+	install -m 644 -o root -g $(GROUP) $^ $(PREFIX)/share/ha-tools
+
+gen-tools: $(TOOLS)
+	mkdir -p gen
+	sed -e 's@\$$(dirname \$$0)/@$${HA_TOOLS_SHARE:-$(PREFIX)/share/ha-tools}@g;' <$$i >>gen/$$i
+
 clean:
+	rm -rf gen
 
 check:
 
