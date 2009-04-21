@@ -91,8 +91,7 @@ elif [ "$agent" = "--cib-resource" ] || [ "$agent" = "-i" ]; then
 	resource="$1"
 	shift
 	agent_args=$(cibadmin -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2variables.xslt -)
-	echo $agent_args
-	exit 1
+	agent_bin=
 elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
 	[ -x "$agent_bin" ] || die "no such resource agent \`$agent'"
