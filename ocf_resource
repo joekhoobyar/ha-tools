@@ -11,6 +11,7 @@
 
 version=0.1
 progname=$(basename $0)
+HA_TOOLS_SHARE=$(dirname $0)
 
 print_usage() {
 	if [ -x "$agent_bin" ]; then
@@ -86,6 +87,12 @@ agent="$1"
 shift
 if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
+elif [ "$agent" = "--cib-resource" ] || [ "$agent" = "-i" ]; then
+	resource="$1"
+	shift
+	agent_args=$(cibadmin -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2variables.xslt /dev/stdin)
+	echo $agent_args
+	exit 1
 elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
 	[ -x "$agent_bin" ] || die "no such resource agent \`$agent'"
@@ -100,8 +107,8 @@ else
 	agent_bin="$OCF_BIN/${agent//:://}"
 fi
 
-SHORTOPTS="hVvcp:M::C:m::s::A::Z::r::R:"
-LONGOPTS="help,version,verbose,check,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
+SHORTOPTS="hVvi:cp:M::C:m::s::A::Z::r::R:"
+LONGOPTS="help,version,verbose,cib-resource,check,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
