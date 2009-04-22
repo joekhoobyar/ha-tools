@@ -104,7 +104,7 @@ read_crm_resource_xml() {
 	$CRM_RESOURCE -r "$1" -x | awk '{ if (i) print }; /^raw xml:/ { i = 1 }'
 }
 
-parse_resource_primitive_xmlimitive_xml() {
+parse_resource_primitive_xml() {
 	resource="$2"
 	if [ -z "$resource" ] || [ "${resource:0:1}" == "-" ]; then
 		print_usage; exit 1
@@ -122,15 +122,17 @@ parse_lrmadmin_output() {
 	fi
 	agent_args=$($LRMADMIN -I "$resource")
 	echo $agent_args | fgrep -qv "Resource ID:$resource Resource agent class:ocf" && die "no such CRM resource: $resource"
-	agent_bin=$(echo $agent_args | sed -e 's@^.*Resource agent type:\([^ ]\+\).*$@\1@g')
-	agent_bin="$OCF_BIN/$(echo $agent_args | sed -e 's@^.*Resource agent provider:\([^ ]\+\).*$@\1/@g')$agent_bin"
-	agent_args=$($LRMADMIN -I "$resource" | sed -ne 's@  \+\([^ ]\)@" "OCF_RESKEY_\1@g; s@^Resource agent parameters: *\([^ ].*\) *$@"OCF_RESKEY_\1"@p;')'  "OCF_RESOURCE_INSTANCE='$resource'"'
+	agent_type=$(echo $agent_args | sed -e 's@^.*Resource agent type:\([^ ]\+\).*$@\1@g')
+	agent_bin="$OCF_BIN/$(echo $agent_args | sed -e 's@^.*Resource agent provider:\([^ ]\+\).*$@\1/@g')$agent_type"
+	agent_args=$($LRMADMIN -I "$resource" | sed -ne 's@  \+\([^ ]\)@" "OCF_RESKEY_\1@g; s@^Resource agent parameters: *\([^ ].*\) *$@"OCF_RESKEY_\1"@p;')'  "OCF_RESOURCE_INSTANCE='$resource'"  "OCF_RESOURCE_TYPE='$agent_type'"'
 	agent_args=$(eval echo $agent_args)
 }
 
 run_agent() {
-	[ -z "$resource" ] && [ -n "$2" ] && [ "${2##-*}" != "$2" ] && resource="$2"
-
+	if [ -z "$resource" ] && [ -n "$2" ] && [ "${2##-*}" != "$2" ];
+		resource="$2"
+		agent_bin="${agent##*::} $agent_bin"
+	fi
 	if [ -z "$resource" ]; then
 		[ -n "$CHECK_CRM" ] && die "option -c requires a resource instance name"
 		env $agent_args $agent_bin $1
@@ -154,11 +156,11 @@ if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
 elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
 	agent_xml="$(read_crm_resource_xml "$1")"
-	parse_resource_primitive_xmlimitive_xml "$agent_xml" "$1"; shift
+	parse_resource_primitive_xml "$agent_xml" "$1"; shift
 elif [ "$agent" = "--xml-string" ] || [ "$agent" = "-X" ]; then
-	parse_resource_primitive_xmlimitive_xml "$1" "$2"; shift 2
+	parse_resource_primitive_xml "$1" "$2"; shift 2
 elif [ "$agent" = "--xml-file" ] || [ "$agent" = "-x" ]; then
-	parse_resource_primitive_xmlimitive_xml "$(cat $1)" "$2"; shift 2
+	parse_resource_primitive_xml "$(cat $1)" "$2"; shift 2
 elif [ "$agent" = "--from-lrm" ] || [ "$agent" = "-l" ]; then
 	parse_lrmadmin_output "$1"; shift
 elif [ "$agent" != "${agent##*::}" ]; then
