@@ -34,6 +34,7 @@ A tool to invoke OCF resource agents directly.
 resource-agent:       fully-qualified resource agent name (i.e. heartbeat/IPaddr2)
 resource-primitive:   any one of the following..
   -g, --from-crm      retrieve resource agent and configuration, by ID, from the CIB
+  -l, --from-lrm      retrieve resource agent and configuration, by ID, from the LRM
 
 Options:
   -h, --help          print this usage message
@@ -135,8 +136,8 @@ else
 	agent_bin="$OCF_BIN/${agent//:://}"
 fi
 
-SHORTOPTS="hVvg:cp:M::C:m::s::A::Z::r:R::"
-LONGOPTS="help,version,verbose,from-cib:,check,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
+SHORTOPTS="hVvg:l:cp:M::C:m::s::A::Z::r:R::"
+LONGOPTS="help,version,verbose,from-crm:,from-lrm:check,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
