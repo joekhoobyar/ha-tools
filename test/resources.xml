@@ -7,4 +7,12 @@
 			</attributes>
 		</instance_attributes>
 	</primitive>
+	<primitive id="test-IP-Addr2" class="ocf" type="IPaddr2" provider="heartbeat" clone="0">
+		<instance_attributes id="test-IP-Addr2_instance_attrs">
+			<attributes>
+				<nvpair id="test-IP-Addr2_ip" name="ip" value="192.168.2.5"/>
+				<nvpair id="test-IP-Addr2_iflabel" name="iflabel" value="tst"/>
+			</attributes>
+		</instance_attributes>
+	</primitive>
 </resources>
