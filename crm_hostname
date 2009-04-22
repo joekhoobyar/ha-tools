@@ -12,6 +12,21 @@
 version=0.1
 progname=$(basename $0)
 
+witchy() {
+	local p="$1" f=$(basename "$1")
+	local w=$(which "$f" 2>/dev/null)
+	if [ -n "$w" ]; then
+		echo "$w"
+	elif [ -x "$progdir/$f" ]; then
+		echo "$progdir/$f"
+	else
+		echo "$p"; [ -x "$p" ]
+	fi
+}
+
+: ${CIBADMIN=$(witchy /usr/sbin/cibadmin)}
+: ${CRM_UUID=$(witchy /usr/sbin/crm_uuid)}
+
 print_usage() {
     cat <<EOF
 Usage: $progname [options]
