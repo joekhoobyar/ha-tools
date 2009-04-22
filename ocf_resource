@@ -16,13 +16,14 @@ progdir=$(dirname $0)
 : ${HA_TOOLS_SHARE=$progdir}
 
 witchy() {
-	local p=$1 f=$(basename $p) w=$(which $1 2>/dev/null)
+	local p="$1" f=$(basename "$1")
+	local w=$(which "$f" 2>/dev/null)
 	if [ -n "$w" ]; then
-		echo $w
+		echo "$w"
 	elif [ -x "$progdir/$f" ]; then
 		echo "$progdir/$f"
 	else
-		echo $p; [ -x "$p" ]
+		echo "$p"; [ -x "$p" ]
 	fi
 }
 
