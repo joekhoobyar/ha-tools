@@ -129,11 +129,11 @@ shift
 if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
 elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
-	parse_cib_primitive_xml $($CIBADMIN -Q -o resources) "$1"; shift
+	parse_cib_primitive_xml "$($CIBADMIN -Q -o resources)" "$1"; shift
 elif [ "$agent" = "--xml-string" ] || [ "$agent" = "-X" ]; then
 	parse_cib_primitive_xml "$1" "$2"; shift 2
 elif [ "$agent" = "--xml-file" ] || [ "$agent" = "-x" ]; then
-	parse_cib_primitive_xml $(cat $1) "$2"; shift 2
+	parse_cib_primitive_xml "$(cat $1)" "$2"; shift 2
 elif [ "$agent" = "--from-lrm" ] || [ "$agent" = "-l" ]; then
 	parse_lrmadmin_output "$1"; shift
 elif [ "$agent" != "${agent##*::}" ]; then
