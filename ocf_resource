@@ -93,6 +93,7 @@ elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
 	resource="$1"
 	shift
 	agent_args=$(/usr/sbin/cibadmin -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2shell.xslt -)
+	[ -z "$agent_args" ] && die "no such CRM resource: $resource"
 	agent_bin=$(eval echo ${agent_args##* })
 	agent_args=$(eval echo ${agent_args% *})
 elif [ "$agent" != "${agent##*::}" ]; then
