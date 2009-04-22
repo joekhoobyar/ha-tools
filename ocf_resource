@@ -51,7 +51,9 @@ Commands:
   -Z, --stop          start the resource
   -R, --reload        gracefully reload the resource
   -r, --run {cmd}     run arbitrary command {cmd} on this resource
+
 EOF
+print_version
 	fi
 }
 

@@ -30,7 +30,9 @@ Options:
 Commands:
 
   -C, --clear         clear resource errors
+
 EOF
+print_version
 }
 
 print_version()

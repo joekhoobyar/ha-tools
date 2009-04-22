@@ -22,7 +22,9 @@ Options:
   -h, --help          print this usage message
   -V, --version       print program version
   -v, --verbose       verbose output
+
 EOF
+print_version
 }
 
 print_version()

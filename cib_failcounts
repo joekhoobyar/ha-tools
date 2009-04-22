@@ -28,7 +28,9 @@ Options:
 Commands:
   -f, --flush         flush all failure counts from the CIB
   -l, --list          list all failure counts in the CIB
+
 EOF
+print_version
 }
 
 print_version()
