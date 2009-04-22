@@ -91,9 +91,12 @@ if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
 elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
 	resource="$1"
+	if [ -z "$resource" ] || [ "${resource:0:1}" == "-" ]; then
+		print_usage; exit 1
+	fi
 	shift
 	agent_args=$(/usr/sbin/cibadmin -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2shell.xslt -)
-	[ -z "$agent_args" ] && die "no such CRM resource: $resource"
+	[ $(echo -n $agent_args) = 'OCF_RESOURCE_INSTANCE="'$resource'"' ] && die "no such CRM resource: $resource"
 	agent_bin=$(eval echo ${agent_args##* })
 	agent_args=$(eval echo ${agent_args% *})
 elif [ "$agent" != "${agent##*::}" ]; then
