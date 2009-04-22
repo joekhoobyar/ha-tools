@@ -11,6 +11,7 @@
 
 version=0.1
 progname=$(basename $0)
+progdir=$(dirname $0)
 
 witchy() {
 	local p="$1" f=$(basename "$1")
