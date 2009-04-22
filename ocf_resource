@@ -108,13 +108,17 @@ parse_lrmadmin_output() {
 }
 
 run_agent() {
-	if [ -z "$2" ] || [ "${2##-*}" != "$2" ]; then
+	[ -z "$resource" ] && [ -n "$2" ] && [ "${2##-*}" != "$2" ] && resource="$2"
+
+	if [ -z "$resource" ]; then
 		[ -n "$CHECK_CRM" ] && die "option -c requires a resource instance name"
 		env $agent_args $agent_bin $1
-	elif [ "$1" != "status" ] && [ -n "$CHECK_CRM" ] && crm_resource -r "$2" -W -Q | grep -v $(crm_hostname); then
-		print_warning "skipping $1: resource $2 is not running via the CRM"
-	else
+	elif [ "$1" != "status" ] && [ -n "$CHECK_CRM" ] && crm_resource -r "$resource" -W -Q | grep -v $(crm_hostname); then
+		print_warning "skipping $1: resource $resource is not running via the CRM"
+	elif [ "$agent_args" = "${agent_args/OCF_RESOURCE_INSTANCE=}" ]; then
 		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin $1
+	else
+		env $agent_args $agent_bin $1
 	fi
 }
 
