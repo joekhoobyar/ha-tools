@@ -28,7 +28,7 @@ Copyright (c) 2009 All Rights Reserved
 		<xsl:if test="@clone">
 			<xsl:value-of select="concat('OCF_RESKEY_CRM_meta_clone=&quot;',@clone,'&quot; ')"/>
 		</xsl:if>
-		<xsl:value-of select="concat('OCF_RESOURCE_TYPE=&quot;',@type,'&quot;')"/>
+		<xsl:value-of select="concat('OCF_RESOURCE_TYPE=&quot;',@type,'&quot; ')"/>
 		<xsl:apply-templates select="instance_attributes/attributes/nvpair"/>
 		<xsl:value-of select="concat('&quot;$OCF_ROOT/resource.d/',@provider,'/',@type,'&quot;')"/>
 	</xsl:template>
