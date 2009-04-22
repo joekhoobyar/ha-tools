@@ -104,7 +104,7 @@ elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
 	fi
 	shift
 	agent_args=$($CIBADMIN -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2shell.xslt -)
-	[ $(echo -n $agent_args) = 'OCF_RESOURCE_INSTANCE="'$resource'"' ] && die "no such CRM resource: $resource"
+	[ "$(echo -n $agent_args)" = "OCF_RESOURCE_INSTANCE=\"$resource\"" ] && die "no such CRM resource: $resource"
 	agent_bin=$(eval echo ${agent_args##* })
 	agent_args=$(eval echo ${agent_args% *})
 elif [ "$agent" = "--from-lrm" ] || [ "$agent" = "-l" ]; then
