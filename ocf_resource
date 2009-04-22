@@ -87,7 +87,6 @@ parse_cib_primitive_xml() {
 	if [ -z "$resource" ] || [ "${resource:0:1}" == "-" ]; then
 		print_usage; exit 1
 	fi
-	shift
 	agent_args=$(echo "$1" | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2shell.xslt -)
 	[ "$(echo -n $agent_args)" = "OCF_RESOURCE_INSTANCE=\"$resource\"" ] && die "no such resource: $resource"
 	agent_bin=$(eval echo ${agent_args##* })
@@ -99,7 +98,6 @@ parse_lrmadmin_output() {
 	if [ -z "$resource" ] || [ "${resource:0:1}" == "-" ]; then
 		print_usage; exit 1
 	fi
-	shift
 	agent_args=$($LRMADMIN -I "$resource")
 	echo $agent_args | fgrep -qv "Resource ID:$resource Resource agent class:ocf" && die "no such CRM resource: $resource"
 	agent_bin=$(echo $agent_args | sed -e 's@^.*Resource agent type:\([^ ]\+\).*$@\1@g')
