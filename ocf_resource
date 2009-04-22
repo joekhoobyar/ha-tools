@@ -11,10 +11,24 @@
 
 version=0.1
 progname=$(basename $0)
+progdir=$(dirname $0)
 
-: ${HA_TOOLS_SHARE=$(dirname $0)}
-: ${CIBADMIN=$(which cibadmin 2>/dev/null)}
-[ -z "$CIBADMIN" ] && CIBADMIN=/usr/sbin/cibadmin
+: ${HA_TOOLS_SHARE=$progdir}
+
+witchy() {
+	local p=$1 f=$(basename $p) w=$(which $1 2>/dev/null)
+	if [ -n "$w" ]; then
+		echo $w
+	elif [ -x "$progdir/$f" ]; then
+		echo "$progdir/$f"
+	else
+		echo $p; [ -x "$p" ]
+	fi
+}
+
+: ${CIBADMIN=$(witchy /usr/sbin/cibadmin)}
+: ${CRM_RESOURCE=$(witchy /usr/sbin/crm_resource)}
+: ${CRM_HOSTNAME=$(witchy /usr/local/sbin/crm_hostname)}
 if uname -m | grep -q 64; then
 	LRMADMIN=${CIBADMIN%/*/cibadmin}/lib64/heartbeat/lrmadmin
 else
@@ -113,7 +127,7 @@ run_agent() {
 	if [ -z "$resource" ]; then
 		[ -n "$CHECK_CRM" ] && die "option -c requires a resource instance name"
 		env $agent_args $agent_bin $1
-	elif [ "$1" != "status" ] && [ -n "$CHECK_CRM" ] && crm_resource -r "$resource" -W -Q | grep -v $(crm_hostname); then
+	elif [ "$1" != "status" ] && [ -n "$CHECK_CRM" ] && $CRM_RESOURCE -r "$resource" -W -Q | grep -v $($CRM_HOSTNAME); then
 		print_warning "skipping $1: resource $resource is not running via the CRM"
 	elif [ "$agent_args" = "${agent_args/OCF_RESOURCE_INSTANCE=}" ]; then
 		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin $1
