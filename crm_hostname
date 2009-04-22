@@ -87,14 +87,14 @@ esac
 shift
 done
 
-CRM_UUID=$(if [ "$VERBOSE" = "1" ]; then crm_uuid -r; else crm_uuid; fi)
-CRM_HOSTNAME=$(cibadmin -Q -o nodes | tr '\n' ' ' | sed -e 's@> *@>\n@g;' | grep -- "$CRM_UUID" | sed -e 's@^.*uname="\([^"]*\)".*$@\1@g')
-if [ -z "$CRM_HOSTNAME" ]; then
+uuid=$(if [ "$VERBOSE" = "1" ]; then $CRM_UUID -r; else $CRM_UUID; fi)
+host=$($CIBADMIN -Q -o nodes | tr '\n' ' ' | sed -e 's@> *@>\n@g;' | grep -- "$uuid" | sed -e 's@^.*uname="\([^"]*\)".*$@\1@g')
+if [ -z "$host" ]; then
 	echo "$progname: failed to retrieve hostname from the CRM" 1>&2
 	exit 1
 elif [ "$VERBOSE" = "1" ]; then
-	echo "$progname: $CRM_HOSTNAME (crm_uuid: $CRM_UUID)"
+	echo "$progname: $host (crm_uuid: $uuid)"
 else
-	echo $CRM_HOSTNAME
+	echo $host
 fi
 
