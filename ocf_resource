@@ -27,13 +27,12 @@ witchy() {
 	fi
 }
 
-: ${CIBADMIN=$(witchy /usr/sbin/cibadmin)}
 : ${CRM_RESOURCE=$(witchy /usr/sbin/crm_resource)}
 : ${CRM_HOSTNAME=$(witchy /usr/local/sbin/crm_hostname)}
 if uname -m | grep -q 64; then
-	LRMADMIN=${CIBADMIN%/*/cibadmin}/lib64/heartbeat/lrmadmin
+	LRMADMIN=${CRM_RESOURCE%/*/crm_resource}/lib64/heartbeat/lrmadmin
 else
-	LRMADMIN=${CIBADMIN%/*/cibadmin}/lib/heartbeat/lrmadmin
+	LRMADMIN=${CRM_RESOURCE%/*/crm_resource}/lib/heartbeat/lrmadmin
 fi
 
 print_usage() {
@@ -62,14 +61,17 @@ Options:
 
 Commands:
 
-  -M, --metadata      display the resource agent's metadata
-  -C, --validate-all  validate the resource and it's configuration
-  -m, --monitor       monitor the resource
   -s, --status        check the resource's status, a la an LSB initscript
   -A, --start         stop the resource
   -Z, --stop          start the resource
+  -m, --monitor       monitor the resource
   -R, --reload        gracefully reload the resource
+  -C, --validate-all  validate the resource and it's configuration
   -r, --run {cmd}     run arbitrary command {cmd} on this resource
+  -M, --metadata      display the resource agent's metadata
+  -P, --primitive     dump the resource instance's "effective" primivite XML
+                      (use with -g, even works on clone instances)
+                      
 
 EOF
 print_version
@@ -151,7 +153,8 @@ shift
 if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
 elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
-	parse_cib_primitive_xml "$(read_cib_resource_xml "$1")" "$1"; shift
+	agent_xml="$(read_cib_resource_xml "$1")"
+	parse_cib_primitive_xml "$agent_xml" "$1"; shift
 elif [ "$agent" = "--xml-string" ] || [ "$agent" = "-X" ]; then
 	parse_cib_primitive_xml "$1" "$2"; shift 2
 elif [ "$agent" = "--xml-file" ] || [ "$agent" = "-x" ]; then
@@ -175,8 +178,8 @@ else
 	p=':'; pp='::'
 fi
 
-SHORTOPTS="hVvg:l:x:X:cp:M${pp}C${p}m${pp}s${pp}A${pp}Z${pp}r${p}R${pp}"
-LONGOPTS="help,version,verbose,from-crm:,from-lrm:,xml-file:,xml-string:,check-crm,param:,metadata${pp},validate-all${p},monitor${pp},status${pp},start${pp},stop${pp},reload${pp},run${p}"
+SHORTOPTS="hVvg:l:x:X:cp:M${pp}C${p}m${pp}s${pp}A${pp}Z${pp}r${p}R${pp}P"
+LONGOPTS="help,version,verbose,from-crm:,from-lrm:,xml-file:,xml-string:,check-crm,param:,metadata${pp},validate-all${p},monitor${pp},status${pp},start${pp},stop${pp},reload${pp},run${p},primitive"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
@@ -227,6 +230,10 @@ case $1 in
   	;;
   -r|--run)
 		run_agent "$2" "$3"; retval=$?; shift 2
+  	;;
+  -P|--primitive)
+		[ -n "$agent_xml" ] || die "no CIB XML was retrieved for this resource"
+		echo "$agent_xml"
   	;;
   -p|--param)
 		if [ "${2:0:16}" = "OCF_CHECK_LEVEL=" ]; then
