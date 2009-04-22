@@ -43,6 +43,7 @@ Options:
   -V, --version       print program version
   -v, --verbose       verbose output
   -p, --param         OCF parameters, in the form:  name="value"
+  -c, --check-crm     first check the CRM to see if the resource is running locally
 
 Commands:
 
@@ -108,9 +109,9 @@ parse_lrmadmin_output() {
 
 run_agent() {
 	if [ -z "$2" ] || [ "${2##-*}" != "$2" ]; then
-		[ -n "$CRM_CHECK" ] && die "option -c requires a resource instance name"
+		[ -n "$CHECK_CRM" ] && die "option -c requires a resource instance name"
 		env $agent_args $agent_bin $1
-	elif [ "$1" != "status" ] && [ -n "$CRM_CHECK" ] && crm_resource -r "$2" -W -Q | grep -v $(crm_hostname); then
+	elif [ "$1" != "status" ] && [ -n "$CHECK_CRM" ] && crm_resource -r "$2" -W -Q | grep -v $(crm_hostname); then
 		print_warning "skipping $1: resource $2 is not running via the CRM"
 	else
 		env $agent_args OCF_RESOURCE_INSTANCE="$2" $agent_bin $1
@@ -149,7 +150,7 @@ else
 fi
 
 SHORTOPTS="hVvg:l:cp:M::C:m::s::A::Z::r:R::"
-LONGOPTS="help,version,verbose,from-crm:,from-lrm:check,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
+LONGOPTS="help,version,verbose,from-crm:,from-lrm:check-crm,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
@@ -175,7 +176,7 @@ case $1 in
     export VERBOSE=1
     ;;
   -c|--check-crm)
-    export CRM_CHECK=1
+    export CHECK_CRM=1
     ;;
   -M|--metadata)
 		run_agent meta-data; retval=$?
