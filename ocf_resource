@@ -11,7 +11,15 @@
 
 version=0.1
 progname=$(basename $0)
+
 : ${HA_TOOLS_SHARE=$(dirname $0)}
+: ${CIBADMIN=$(which cibadmin 2>/dev/null)}
+[ -z "$CIBADMIN" ] && CIBADMIN=/usr/sbin/cibadmin
+if uname -m | grep -q 64; then
+	LRMADMIN=${CIBADMIN%/*/cibadmin}/lib64/heartbeat/lrmadmin
+else
+	LRMADMIN=${CIBADMIN%/*/cibadmin}/lib/heartbeat/lrmadmin
+fi
 
 print_usage() {
 	if [ -x "$agent_bin" ]; then
@@ -95,10 +103,22 @@ elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
 		print_usage; exit 1
 	fi
 	shift
-	agent_args=$(/usr/sbin/cibadmin -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2shell.xslt -)
+	agent_args=$($CIBADMIN -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2shell.xslt -)
 	[ $(echo -n $agent_args) = 'OCF_RESOURCE_INSTANCE="'$resource'"' ] && die "no such CRM resource: $resource"
 	agent_bin=$(eval echo ${agent_args##* })
 	agent_args=$(eval echo ${agent_args% *})
+elif [ "$agent" = "--from-lrm" ] || [ "$agent" = "-l" ]; then
+	resource="$1"
+	if [ -z "$resource" ] || [ "${resource:0:1}" == "-" ]; then
+		print_usage; exit 1
+	fi
+	shift
+	agent_args=$($LRMADMIN -I "$resource")
+	echo $agent_args | fgrep -qv "Resource ID:$resource Resource agent class:ocf" && die "no such CRM resource: $resource"
+	agent_bin=$(echo $agent_args | sed -e 's@^.*Resource agent type:\([^ ]\+\).*$@\1@g')
+	agent_bin="$OCF_ROOT/$(echo $agent_args | sed -e 's@^.*Resource agent provider:\([^ ]\+\).*$@\1/@g')$agent_bin"
+	agent_args=$($LRMADMIN -I "$resource" | sed -ne 's@  \+\([^ ]\)@" "OCF_RESKEY_\1@g; s@^Resource agent parameters: *@"OCF_RESKEY_@p;')'" OCF_RESOURCE_INSTANCE='$resource'"'
+	agent_args=$(eval echo $agent_args)
 elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
 	[ -x "$agent_bin" ] || die "no such resource agent \`$agent'"
