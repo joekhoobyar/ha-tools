@@ -129,13 +129,13 @@ shift
 if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
 elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
-	$CIBADMIN -Q -o resources | parse_cib_primitive_xml "$1"
+	$CIBADMIN -Q -o resources | parse_cib_primitive_xml "$1"; shift
 elif [ "$agent" = "--xml-string" ] || [ "$agent" = "-X" ]; then
-	echo "$1" | parse_cib_primitive_xml "$2"
+	echo "$1" | parse_cib_primitive_xml "$2"; shift 2
 elif [ "$agent" = "--xml-file" ] || [ "$agent" = "-x" ]; then
-	cat "$1" | parse_cib_primitive_xml "$2"
+	cat "$1" | parse_cib_primitive_xml "$2"; shift 2
 elif [ "$agent" = "--from-lrm" ] || [ "$agent" = "-l" ]; then
-	parse_lrmadmin_output "$1"
+	parse_lrmadmin_output "$1"; shift
 elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
 	[ -x "$agent_bin" ] || die "no such resource agent \`$agent'"
