@@ -138,19 +138,22 @@ elif [ "$agent" = "--from-lrm" ] || [ "$agent" = "-l" ]; then
 elif [ "$agent" != "${agent##*::}" ]; then
 	agent_bin="$OCF_BIN/${agent//:://}"
 	[ -x "$agent_bin" ] || die "no such resource agent \`$agent'"
+	p=':'; pp='::'
 elif [ -x "$OCF_BIN/heartbeat/$agent" ]; then
 	agent="heartbeat::$agent"
 	print_warning "guessing fully-qualified resource agent name: $agent"
 	agent_bin="$OCF_BIN/${agent//:://}"
+	p=':'; pp='::'
 else
 	agent=$(find $OCF_BIN -maxdepth 2 -mindepth 2 -name IPaddr2 -not -type d | sed -ne 's@^/usr/lib/ocf/resource.d/\([^/]\+\)/@\1::@p' | head -1)
 	[ -z "$agent" ] && die "no such resource agent: $agent"
 	print_warning "guessing fully-qualified resource agent name: $agent"
 	agent_bin="$OCF_BIN/${agent//:://}"
+	p=':'; pp='::'
 fi
 
-SHORTOPTS="hVvg:l:cp:M::C:m::s::A::Z::r:R::"
-LONGOPTS="help,version,verbose,from-crm:,from-lrm:check-crm,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
+SHORTOPTS="hVvg:l:x:X:cp:M${pp}C${p}m${pp}s${pp}A${pp}Z${pp}r${p}R${pp}"
+LONGOPTS="help,version,verbose,from-crm:,from-lrm:,xml-file:,xml-string:,check-crm,param:,metadata${pp},validate-all${p},monitor${pp},status${pp},start${pp},stop${pp},reload${pp},run${p}"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
