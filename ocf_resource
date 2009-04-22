@@ -104,7 +104,7 @@ read_crm_resource_xml() {
 	$CRM_RESOURCE -r "$1" -x | awk '{ if (i) print }; /^raw xml:/ { i = 1 }'
 }
 
-parse_cib_primitive_xml() {
+parse_resource_primitive_xmlimitive_xml() {
 	resource="$2"
 	if [ -z "$resource" ] || [ "${resource:0:1}" == "-" ]; then
 		print_usage; exit 1
@@ -153,12 +153,12 @@ shift
 if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
 elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
-	agent_xml="$(read_cib_resource_xml "$1")"
-	parse_cib_primitive_xml "$agent_xml" "$1"; shift
+	agent_xml="$(read_crm_resource_xml "$1")"
+	parse_resource_primitive_xmlimitive_xml "$agent_xml" "$1"; shift
 elif [ "$agent" = "--xml-string" ] || [ "$agent" = "-X" ]; then
-	parse_cib_primitive_xml "$1" "$2"; shift 2
+	parse_resource_primitive_xmlimitive_xml "$1" "$2"; shift 2
 elif [ "$agent" = "--xml-file" ] || [ "$agent" = "-x" ]; then
-	parse_cib_primitive_xml "$(cat $1)" "$2"; shift 2
+	parse_resource_primitive_xmlimitive_xml "$(cat $1)" "$2"; shift 2
 elif [ "$agent" = "--from-lrm" ] || [ "$agent" = "-l" ]; then
 	parse_lrmadmin_output "$1"; shift
 elif [ "$agent" != "${agent##*::}" ]; then
