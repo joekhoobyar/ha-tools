@@ -17,13 +17,13 @@ Copyright (c) 2009 All Rights Reserved
 
 	<xsl:param name="resource-id"/>
 
-	<xsl:template match="//resources">
+	<xsl:template match="/">
 		<xsl:value-of select="concat('OCF_RESOURCE_INSTANCE=&quot;',$resource-id,'&quot; ')"/>
-		<xsl:apply-templates select=".//primitive[@id = $resource-id]"/>
+		<xsl:apply-templates select="//primitive[@id = $resource-id]"/>
 	</xsl:template>
 
 	<xsl:template match="primitive[@class = 'ocf']">
-		<xsl:apply-templates select="./instance_attributes/attributes/nvpair"/>
+		<xsl:apply-templates select="instance_attributes/attributes/nvpair"/>
 		<xsl:value-of select="concat('&quot;$OCF_ROOT/resource.d/',@provider,'/',@type,'&quot;')"/>
 	</xsl:template>
 

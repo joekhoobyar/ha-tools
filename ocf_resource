@@ -98,6 +98,10 @@ die() {
 	exit 1
 }
 
+read_crm_resource_xml() {
+	$CRM_RESOURCE -r "$1" -x | awk '{ if (i) print }; /^raw xml:/ { i = 1 }'
+}
+
 parse_cib_primitive_xml() {
 	resource="$2"
 	if [ -z "$resource" ] || [ "${resource:0:1}" == "-" ]; then
@@ -147,7 +151,7 @@ shift
 if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
 elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
-	parse_cib_primitive_xml "$($CIBADMIN -Q -o resources)" "$1"; shift
+	parse_cib_primitive_xml "$(read_cib_resource_xml "$1")" "$1"; shift
 elif [ "$agent" = "--xml-string" ] || [ "$agent" = "-X" ]; then
 	parse_cib_primitive_xml "$1" "$2"; shift 2
 elif [ "$agent" = "--xml-file" ] || [ "$agent" = "-x" ]; then
