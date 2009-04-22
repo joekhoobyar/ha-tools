@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# A tool to administer OCF resources directly.
+# A tool to invoke OCF resource agents directly.
 #
 # http://github.com/joekhoobyar/ha-tools
 #
@@ -19,12 +19,13 @@ print_usage() {
 	else
     cat <<EOF
 Usage: $progname resource-agent [options] command [resource-id]
+       $progname [resource-primitive] [options] command
 
-A tool to deal with errors in the CIB.
+A tool to invoke OCF resource agents directly.
 
-Resource Agent:
-
-  A fully-qualified resource agent name, such as: heartbeat/IPaddr2
+resource-agent:       fully-qualified resource agent name (i.e. heartbeat/IPaddr2)
+resource-primitive:   any one of the following..
+  -g, --from-crm      retrieve resource agent and configuration, by ID, from the CIB
 
 Options:
   -h, --help          print this usage message
@@ -41,6 +42,7 @@ Commands:
   -A, --start         stop the resource
   -Z, --stop          start the resource
   -R, --reload        gracefully reload the resource
+  -r, --run {cmd}     run arbitrary command {cmd} on this resource
 EOF
 	fi
 }
@@ -87,7 +89,7 @@ agent="$1"
 shift
 if [ -z "$agent" ] || [ "$agent" = "--help" ]; then
 	print_usage; exit 1
-elif [ "$agent" = "--cib-resource" ] || [ "$agent" = "-i" ]; then
+elif [ "$agent" = "--from-crm" ] || [ "$agent" = "-g" ]; then
 	resource="$1"
 	shift
 	agent_args=$(/usr/sbin/cibadmin -Q -o resources | xsltproc --stringparam resource-id "$resource" $HA_TOOLS_SHARE/resource2shell.xslt -)
@@ -107,8 +109,8 @@ else
 	agent_bin="$OCF_BIN/${agent//:://}"
 fi
 
-SHORTOPTS="hVvi:cp:M::C:m::s::A::Z::r::R:"
-LONGOPTS="help,version,verbose,cib-resource,check,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
+SHORTOPTS="hVvg:cp:M::C:m::s::A::Z::r:R::"
+LONGOPTS="help,version,verbose,from-cib:,check,param:,metadata::,validate-all:,monitor::,status::,start::,stop::,reload::,run:"
 if $(getopt -T >/dev/null 2>&1) ; [ $? = 4 ] ; then # New longopts getopt.
     OPTS=$(getopt -o $SHORTOPTS --long $LONGOPTS -n "$progname" -- "$@")
 else
