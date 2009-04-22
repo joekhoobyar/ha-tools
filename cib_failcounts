@@ -72,7 +72,7 @@ fi
 eval set -- "${OPTS}"
 
 get_failcounts() {
-	cibadmin -Q -o status | tr '\n' ' ' | sed -e 's@> *@>\n@g;' | grep 'name="fail-count-'
+	$CIBADMIN -Q -o status | tr '\n' ' ' | sed -e 's@> *@>\n@g;' | grep 'name="fail-count-'
 }
 
 while [ $# -gt 0 ]; do

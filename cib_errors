@@ -25,7 +25,7 @@ witchy() {
 	fi
 }
 
-: ${CIBADMIN=$(witchy /usr/sbin/cibadmin)}
+: ${CRM_RESOURCE=$(witchy /usr/sbin/crm_resource)}
 : ${CCM_TOOL=$(witchy /usr/sbin/ccm_tool)}
 
 
@@ -87,7 +87,7 @@ case $1 in
     export VERBOSE=1
     ;;
   -a|--all)
-		NODES=$(ccm_tool -p)
+		NODES=$($CCM_TOOL -p)
   	;;
   -H|--host)
 		NODES=$2
@@ -99,7 +99,7 @@ case $1 in
   -C|--clear)
 		if [ -z "$NODES" ]; then print_usage; exit 1; fi
 		for i in $NODES; do
-			crm_resource $FORCE -C -H $i -r $3
+			$CRM_RESOURCE $FORCE -C -H $i -r $3
 		done
 		exit 0
   	;;
